@@ -23,11 +23,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data cache - trzymamy lokalne pliki z danymi
-data/*.json
-data/*.csv
-!data/.gitkeep
-
 # Output files - wygenerowane wykresy i raporty
 output/*.png
 output/*.pdf
