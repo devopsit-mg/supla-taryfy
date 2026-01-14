@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Data cache - trzymamy lokalne pliki z danymi
+data/*.json
+data/*.csv
+!data/.gitkeep
+
+# Output files - wygenerowane wykresy i raporty
+output/*.png
+output/*.pdf
+output/*.html
+!output/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Konfiguracja użytkownika (zawiera prywatne tokeny SUPLA)
+src/supla_config.py
+
+# Selenium WebDriver cache
+.wdm/
+
+# pytest
+.pytest_cache/
+
+# OS
+Thumbs.db

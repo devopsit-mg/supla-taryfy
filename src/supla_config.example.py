@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 # ----------------------------
-# KONFIG UŻYTKOWNIKA
+# KONFIG UŻYTKOWNIKA - PRZYKŁAD
 # ----------------------------
-SUPLA_TOKEN = "TO_BE_CONFIGURED"   # Personal Access Token lub OAuth token (Bearer)
-CHANNEL_ID = 111                      # ID kanału licznika energii w SUPLA
-YEAR = 2025
-MONTH = 12
+# Skopiuj ten plik do src/supla_config.py i wypełnij swoimi danymi
+
+SUPLA_TOKEN = "TWOJ_TOKEN_TUTAJ"   # Personal Access Token z SUPLA Cloud
+CHANNEL_ID = 0                      # ID kanału licznika energii w SUPLA
+YEAR = 2026
+MONTH = 1
+
 # Jeśli chcesz policzyć też dni ustawowo wolne (poza weekendem) dla G12w:
 # pip install holidays
 USE_POLISH_HOLIDAYS = True

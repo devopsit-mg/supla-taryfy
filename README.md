@@ -1,89 +1,183 @@
-# Analiza Kosztów Energii (Supla + PGE/TGE)
+# Analiza Kosztów Energii (SUPLA + PGE/TGE)
 
-Skrypt służy do analizy kosztów energii elektrycznej na podstawie danych zużycia z licznika w systemie SUPLA oraz cen energii, w tym cen dynamicznych z Rynku Dnia Następnego (TGE).
+Skrypt do analizy kosztów energii elektrycznej na podstawie danych zużycia z licznika w systemie SUPLA oraz cen energii, w tym cen dynamicznych z Rynku Dnia Następnego (TGE).
 
-## Funkcjonalności
+## 📋 Spis treści
+
+- [Funkcjonalności](#funkcjonalności)
+- [Wymagania](#wymagania)
+- [Instalacja](#instalacja)
+- [Konfiguracja](#konfiguracja)
+- [Uruchomienie](#uruchomienie)
+- [Struktura projektu](#struktura-projektu)
+- [Uwagi](#uwagi)
+- [Disclaimer](#️-disclaimer---wyłączenie-odpowiedzialności)
+- [Licencja](#licencja)
+
+## ✨ Funkcjonalności
 
 *   **Pobieranie danych z SUPLA**: Automatyczne pobieranie logów zużycia energii z API SUPLA.
 *   **Scraping cen TGE**: Pobieranie godzinowych cen energii z Rynku Dnia Następnego ze strony PGE (używając Selenium).
 *   **Caching danych**:
-    *   Logi SUPLA zapisywane są do plików JSON (`supla_logs_...`).
-    *   Ceny TGE zapisywane są do plików CSV (`tge_prices_...`).
+    *   Logi SUPLA zapisywane są do `data/supla_logs_*.json`
+    *   Ceny TGE zapisywane są do `data/tge_prices_*.csv`
 *   **Analiza taryf**: Porównanie kosztów dla taryf:
     *   **G11** (stała stawka całą dobę)
     *   **G12** (strefa dzienna i nocna)
     *   **G12w** (strefa weekendowa)
+    *   **G12n** (strefa niedzielna)
     *   **Taryfa Dynamiczna** (ceny godzinowe TGE + marża i opłaty)
-*   **Wizualizacja**: Generowanie wykresów (`analiza_energii_YYYY_MM.png`) przedstawiających:
-    *   Porównanie kosztów całkowitych.
-    *   Strukturę kosztów.
-    *   Profil zużycia na tle cen giełdowych.
-    *   Średnie zużycie godzinowe.
-    *   Analizę stref czasowych (G12 vs G12w).
+*   **Wizualizacja**: Generowanie wykresów w `output/analiza_energii_YYYY_MM.png`:
+    *   Porównanie kosztów całkowitych
+    *   Struktura kosztów
+    *   Profil zużycia na tle cen giełdowych
+    *   Średnie zużycie godzinowe
+    *   Analiza stref czasowych (G12 vs G12w)
 
-## Wymagania
+## 📦 Wymagania
 
 *   Python 3.8+
 *   Przeglądarka Google Chrome (do scrapowania danych przez Selenium)
+*   Konto SUPLA Cloud z licznikiem energii
 
-## Dla początkujących
+## 🚀 Instalacja
 
-### 1. Jak uzyskać token SUPLA?
-
-1. Zaloguj się na swoje konto w [SUPLA Cloud](https://cloud.supla.org/).
-2. W menu wejdź w **Integracje** -> **API (OAuth)**.
-3. Kliknij **Utwórz nowy token**.
-4. Zaznacz uprawnienia do odczytu kanałów (Channel read) oraz odczytu historii pomiarów (Log read).
-5. Skopiuj wygenerowany token. Będziesz go musiał wkleić w pliku `supla_config.py` w polu `SUPLA_TOKEN`.
-
-### 2. ID kanału
-
-1. W SUPLA Cloud przejdź do listy urządzeń.
-2. Kliknij na swój licznik energii.
-3. ID kanału znajdziesz w adresie przeglądarki lub w szczegółach urządzenia (np. "ID: 12345").
-
-## Instalacja
-
-1.  Sklonuj repozytorium lub pobierz pliki.
-2.  Zainstaluj wymagane biblioteki Python:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-## Konfiguracja
-
-Otwórz plik `supla_config.py` i dostosuj ustawienia:
-
-```python
-SUPLA_TOKEN = "TWOJ_TOKEN_SUPLA"   # Token dostępu do API SUPLA
-CHANNEL_ID = 12345                 # ID kanału licznika energii w SUPLA
-YEAR = 2025                        # Rok do analizy
-MONTH = 12                         # Miesiąc do analizy
-USE_POLISH_HOLIDAYS = True         # Czy uwzględniać święta w taryfie G12w
-```
-
-Możesz również dostosować ceny energii w słowniku `PRICES` oraz opłaty stałe w `FIXED_CHARGES`, jeśli ulegną zmianie.
-
-## Uruchomienie
-
-Uruchom skrypt poleceniem:
+### 1. Sklonuj repozytorium
 
 ```bash
-python3 supla_pge_for.py
+git clone https://github.com/devopsit-mg/supla-taryfy.git
+cd supla-taryfy
 ```
 
-Skrypt:
-1.  Pobierze (lub wczyta z cache) dane o zużyciu z SUPLA.
-2.  Pobierze (lub wczyta z cache) ceny TGE dla wybranego miesiąca.
-3.  Przeliczy koszty dla wszystkich zdefiniowanych taryf.
-4.  Wyświetli podsumowanie w terminalu.
-5.  Wygeneruje plik z wykresami (np. `analiza_energii_2025_12.png`).
+### 2. Zainstaluj zależności Python
 
-## Uwagi
+```bash
+pip install -r requirements.txt
+```
 
-*   Pierwsze uruchomienie dla danego miesiąca może potrwać dłużej ze względu na konieczność pobrania danych ze strony PGE (scraping każdego dnia miesiąca). Kolejne uruchomienia będą korzystać z zapisanego pliku CSV.
-*   Upewnij się, że masz zainstalowaną przeglądarkę Chrome, aby Selenium mogło działać.
+### 3. Utwórz katalogi (jeśli nie istnieją)
+
+```bash
+mkdir -p data output
+```
+
+## ⚙️ Konfiguracja
+
+### Krok 1: Uzyskaj token SUPLA
+
+1. Zaloguj się na swoje konto w [SUPLA Cloud](https://cloud.supla.org/)
+2. Przejdź do: **Konto** → **Bezpieczeństwo** → **Osobiste Tokeny Dostępowe**
+   - Bezpośredni link: [https://cloud.supla.org/security/personal-access-tokens](https://cloud.supla.org/security/personal-access-tokens)
+3. Kliknij **"Generuj nowy token"**
+4. Zaznacz uprawnienia:
+   - ✅ **Kanały** (odczyt danych z urządzeń)
+   - ✅ **Historia pomiarów** (odczyt logów zużycia energii)
+5. Kliknij **"Generuj"** i skopiuj wygenerowany token
+
+### Krok 2: Znajdź ID kanału
+
+1. W SUPLA Cloud przejdź do listy urządzeń
+2. Kliknij na swój licznik energii
+3. ID kanału znajdziesz w adresie URL przeglądarki (np. `/channels/12345`)
+
+### Krok 3: Utwórz plik konfiguracyjny
+
+```bash
+cp src/supla_config.example.py src/supla_config.py
+```
+
+Następnie edytuj plik `src/supla_config.py` i uzupełnij:
+
+```python
+SUPLA_TOKEN = "TWOJ_TOKEN_Z_SUPLA_CLOUD"
+CHANNEL_ID = 12345  # Twoje ID kanału
+YEAR = 2026
+MONTH = 1
+```
+
+### Krok 4: Dostosuj ceny (opcjonalnie)
+
+W pliku `src/supla_config.py` możesz zaktualizować ceny energii i opłaty zgodnie z Twoją fakturą:
+
+```python
+PRICES = {
+    "G11": {"all": 0.5000 + 0.43360},
+    "G12": {
+        "day": 0.5656 + 0.43360,
+        "night": 0.3718 + 0.10860
+    },
+    # ... itd.
+}
+```
+
+## ▶️ Uruchomienie
+
+```bash
+cd src
+python supla_pge.py
+```
+
+### Co robi skrypt?
+
+1.  Pobiera (lub wczyta z cache) dane o zużyciu z SUPLA
+2.  Pobiera (lub wczyta z cache) ceny TGE dla wybranego miesiąca
+3.  Przelicza koszty dla wszystkich zdefiniowanych taryf
+4.  Wyświetla podsumowanie w terminalu
+5.  Generuje wykresy w katalogu `output/`
+
+### Przykładowy wynik w terminalu
+
+```
+============================================================
+  ANALIZA TARYF ENERGII ELEKTRYCZNEJ - 2025-12
+============================================================
+
+📊 Liczba godzin z danymi: 744
+⚡ Całkowite zużycie: 234.56 kWh
+
+────────────────────────────────────────────────────────────
+  PORÓWNANIE TARYF
+────────────────────────────────────────────────────────────
+
+  taryfa  suma_brutto    kWh  roznica_do_najtanszej_zl
+    G12w       256.78  234.56                      0.00
+     G12       267.34  234.56                     10.56
+    G12n       272.45  234.56                     15.67
+     G11       289.12  234.56                     32.34
+```
+
+## 📁 Struktura projektu
+
+```
+supla-taryfy/
+├── src/                              # Kod źródłowy
+│   ├── supla_pge.py                 # Główny skrypt analizy
+│   ├── supla_config.example.py      # Przykładowy plik konfiguracji
+│   └── supla_config.py              # Twoja konfiguracja (git ignore)
+├── data/                             # Dane cache (git ignore)
+│   ├── supla_logs_*.json            # Cache logów SUPLA
+│   ├── tge_prices_*.csv             # Cache cen TGE
+│   └── .gitkeep
+├── output/                           # Wyniki analiz (git ignore)
+│   ├── analiza_energii_*.png        # Wygenerowane wykresy
+│   └── .gitkeep
+├── docs/                             # Dokumentacja dodatkowa
+├── .gitignore                        # Pliki ignorowane przez git
+├── LICENSE                           # Licencja Apache 2.0
+├── README.md                         # Ten plik
+└── requirements.txt                  # Zależności Python
+```
+
+## 📝 Uwagi
+
+*   **Pierwsze uruchomienie**: Może potrwać 5-10 minut ze względu na scraping cen TGE dla całego miesiąca (każdy dzień osobno). Kolejne uruchomienia będą korzystać z cache.
+*   **Google Chrome**: Wymagany do scrapowania danych przez Selenium. WebDriver pobierze się automatycznie.
+*   **Cache**: Dane są zapisywane w katalogach `data/` (logi SUPLA, ceny TGE). Możesz je usunąć, aby wymusić ponowne pobranie.
+*   **Dokładność obliczeń**: Weryfikuj wyniki z oficjalnymi fakturami. Narzędzie służy do analizy i porównań, nie do rozliczeń prawnych.
+
+## 🤝 Współpraca
+
+Zgłaszanie błędów, propozycje nowych funkcji i pull requesty są mile widziane!
 
 ## ⚠️ DISCLAIMER - WYŁĄCZENIE ODPOWIEDZIALNOŚCI
 
@@ -118,6 +212,11 @@ Skrypt:
 
 **Korzystając z tego oprogramowania, potwierdzasz, że przeczytałeś/-aś i zrozumiałeś/-aś powyższe ostrzeżenia oraz akceptujesz wszystkie związane z tym ryzyka.**
 
-## Licencja
+## 📄 Licencja
 
 Ten projekt jest udostępniony na licencji Apache 2.0. Zobacz plik [LICENSE](LICENSE) po więcej szczegółów.
+
+---
+
+**Autor:** [devopsit-mg](https://github.com/devopsit-mg)  
+**Repozytorium:** [supla-taryfy](https://github.com/devopsit-mg/supla-taryfy)
