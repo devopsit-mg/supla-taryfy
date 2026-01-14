@@ -49,13 +49,27 @@ git clone https://github.com/devopsit-mg/supla-taryfy.git
 cd supla-taryfy
 ```
 
-### 2. Zainstaluj zależności Python
+### 2. Utwórz wirtualne środowisko Python (zalecane)
+
+```bash
+# Utwórz venv
+python3 -m venv venv
+
+# Aktywuj venv
+# Na macOS/Linux:
+source venv/bin/activate
+
+# Na Windows:
+# venv\Scripts\activate
+```
+
+### 3. Zainstaluj zależności Python
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Utwórz katalogi (jeśli nie istnieją)
+### 4. Utwórz katalogi (jeśli nie istnieją)
 
 ```bash
 mkdir -p data output
@@ -112,6 +126,13 @@ PRICES = {
 
 ## ▶️ Uruchomienie
 
+**Upewnij się, że venv jest aktywne** (jeśli go używasz):
+```bash
+source venv/bin/activate  # macOS/Linux
+# lub venv\Scripts\activate na Windows
+```
+
+Uruchom skrypt:
 ```bash
 cd src
 python supla_pge.py
@@ -119,8 +140,8 @@ python supla_pge.py
 
 ### Co robi skrypt?
 
-1.  Pobiera (lub wczyta z cache) dane o zużyciu z SUPLA
-2.  Pobiera (lub wczyta z cache) ceny TGE dla wybranego miesiąca
+1.  Pobiera (lub wczytuje z cache `data/`) dane o zużyciu z SUPLA
+2.  Pobiera (lub wczytuje z cache `data/`) ceny TGE dla wybranego miesiąca
 3.  Przelicza koszty dla wszystkich zdefiniowanych taryf
 4.  Wyświetla podsumowanie w terminalu
 5.  Generuje wykresy w katalogu `output/`
