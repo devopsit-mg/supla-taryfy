@@ -147,7 +147,9 @@ def load_tge_prices_from_csv(year: int, month: int) -> Optional[pd.DataFrame]:
     """
     import os
     
-    filename = f"tge_prices_{year}_{month:02d}.csv"
+    # Ścieżka do katalogu data (względem katalogu src)
+    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+    filename = os.path.join(data_dir, f"tge_prices_{year}_{month:02d}.csv")
     
     if not os.path.exists(filename):
         return None
@@ -404,7 +406,10 @@ def fetch_tge_prices(year: int, month: int, verbose: bool = False) -> pd.DataFra
                 
                 # ZAPIS DO CSV
                 try:
-                    csv_filename = f"tge_prices_{year}_{month:02d}.csv"
+                    # Ścieżka do katalogu data (względem katalogu src)
+                    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+                    os.makedirs(data_dir, exist_ok=True)
+                    csv_filename = os.path.join(data_dir, f"tge_prices_{year}_{month:02d}.csv")
                     df_to_save = df_real.copy()
                     # Konwersja na naive UTC dla kompatybilności z load_tge_prices_from_csv
                     df_to_save['timestamp'] = df_to_save['timestamp_utc'].dt.tz_convert(None)
@@ -432,7 +437,7 @@ def fetch_tge_prices(year: int, month: int, verbose: bool = False) -> pd.DataFra
         print(f"    4. Używam danych symulowanych (wzorce rynkowe)")
         print(f"       💡 Aby użyć rzeczywistych cen:")
         print(f"          - Zainstaluj Selenium: pip install selenium webdriver-manager")
-        print(f"          - Lub zapisz CSV jako: tge_prices_{year}_{month:02d}.csv")
+        print(f"          - Lub zapisz CSV jako: data/tge_prices_{year}_{month:02d}.csv")
         
         # Generuj godzinowe timestampy dla całego miesiąca
         start = datetime(year, month, 1, 0, 0, 0, tzinfo=timezone.utc)
@@ -620,7 +625,11 @@ def download_measurement_logs_json(api_base: str, token: str, channel_id: int, d
     # Generuj nazwę pliku cache na podstawie parametrów
     year = date_from.year
     month = date_from.month
-    cache_filename = f"supla_logs_{channel_id}_{year}_{month:02d}.json"
+    
+    # Ścieżka do katalogu data (względem katalogu src)
+    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    cache_filename = os.path.join(data_dir, f"supla_logs_{channel_id}_{year}_{month:02d}.json")
     
     # Sprawdź czy plik cache istnieje
     if os.path.exists(cache_filename):
@@ -1108,7 +1117,12 @@ def create_visualizations(hourly: pd.DataFrame, res: pd.DataFrame, year: int, mo
              bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
     
     plt.tight_layout()
-    filename = f'analiza_energii_{year}_{month:02d}.png'
+    
+    # Ścieżka do katalogu output (względem katalogu src)
+    output_dir = os.path.join(os.path.dirname(__file__), '..', 'output')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = os.path.join(output_dir, f'analiza_energii_{year}_{month:02d}.png')
+    
     plt.savefig(filename, dpi=150, bbox_inches='tight')
     print(f"\n✅ Zapisano wykres: {filename}")
     plt.show()
